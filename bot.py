@@ -265,28 +265,51 @@ async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if not in_allowed_topic(update):
         return
 
-    # sichere Referenz auf die Nachricht (funktioniert auch bei Topics/Fotos/etc.)
+    chat = update.effective_chat
     msg = update.effective_message or update.message
+    thread_id = getattr(msg, "message_thread_id", None)
 
+    # Welcome-Bild + Text direkt in den Chat/Topic schicken
     if WELCOME_IMAGE and os.path.exists(WELCOME_IMAGE):
         try:
             with open(WELCOME_IMAGE, "rb") as f:
-                await msg.reply_photo(
+                await ctx.bot.send_photo(
+                    chat_id=chat.id,
                     photo=f,
                     caption=WELCOME_TEXT,
-                    parse_mode="Markdown"
+                    parse_mode="Markdown",
+                    message_thread_id=thread_id,  # wichtig für Topic
                 )
         except Exception as e:
             logger.warning(f"Couldn't send image '{WELCOME_IMAGE}': {e}")
-            await msg.reply_text(WELCOME_TEXT, parse_mode="Markdown")
+            await ctx.bot.send_message(
+                chat_id=chat.id,
+                text=WELCOME_TEXT,
+                parse_mode="Markdown",
+                message_thread_id=thread_id,
+            )
     else:
         logger.warning(f"WELCOME_IMAGE not found at '{WELCOME_IMAGE}'")
-        await msg.reply_text(WELCOME_TEXT, parse_mode="Markdown")
+        await ctx.bot.send_message(
+            chat_id=chat.id,
+            text=WELCOME_TEXT,
+            parse_mode="Markdown",
+            message_thread_id=thread_id,
+        )
 
-    # Panels IMMER an die gleiche Nachricht anhängen
-    await msg.reply_text("🎯 Player Panel", reply_markup=player_keyboard())
-    await msg.reply_text("🛠 Host Panel", reply_markup=host_keyboard())
-
+    # Panels – ebenfalls ohne Reply, direkt in denselben Topic
+    await ctx.bot.send_message(
+        chat_id=chat.id,
+        text="🎯 Player Panel",
+        reply_markup=player_keyboard(),
+        message_thread_id=thread_id,
+    )
+    await ctx.bot.send_message(
+        chat_id=chat.id,
+        text="🛠 Host Panel",
+        reply_markup=host_keyboard(),
+        message_thread_id=thread_id,
+    )
 
 
 async def templ_status(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
