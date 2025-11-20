@@ -280,8 +280,11 @@ async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         logger.warning(f"WELCOME_IMAGE not found at '{WELCOME_IMAGE}'")
         await update.message.reply_text(WELCOME_TEXT, parse_mode="Markdown")
 
-    await update.message.reply_text("🎯 Player Panel", reply_markup=player_keyboard())
-    await update.message.reply_text("🛠 Host Panel", reply_markup=host_keyboard())
+    msg = update.effective_message
+
+await msg.reply_text("🎯 Player Panel", reply_markup=player_keyboard())
+await msg.reply_text("🛠 Host Panel", reply_markup=host_keyboard())
+
 
 async def templ_status(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if not in_allowed_topic(update):
