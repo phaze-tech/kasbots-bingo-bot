@@ -1,7 +1,7 @@
 # --- AUTO-BOOTSTRAP (optional, for local use) ---
 import os, sys
 
-USE_AUTO_BOOTSTRAP = os.getenv("USE_AUTO_BOOTSTRAP", "1") == "1"
+USE_AUTO_BOOTSTRAP = os.getenv("USE_AUTO_BOOTSTRAP", "0") == "1"
 
 if USE_AUTO_BOOTSTRAP:
     import subprocess, venv
