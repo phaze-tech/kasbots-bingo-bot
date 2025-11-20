@@ -265,25 +265,28 @@ async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if not in_allowed_topic(update):
         return
 
+    # sichere Referenz auf die Nachricht (funktioniert auch bei Topics/Fotos/etc.)
+    msg = update.effective_message or update.message
+
     if WELCOME_IMAGE and os.path.exists(WELCOME_IMAGE):
         try:
             with open(WELCOME_IMAGE, "rb") as f:
-                await update.message.reply_photo(
+                await msg.reply_photo(
                     photo=f,
                     caption=WELCOME_TEXT,
                     parse_mode="Markdown"
                 )
         except Exception as e:
             logger.warning(f"Couldn't send image '{WELCOME_IMAGE}': {e}")
-            await update.message.reply_text(WELCOME_TEXT, parse_mode="Markdown")
+            await msg.reply_text(WELCOME_TEXT, parse_mode="Markdown")
     else:
         logger.warning(f"WELCOME_IMAGE not found at '{WELCOME_IMAGE}'")
-        await update.message.reply_text(WELCOME_TEXT, parse_mode="Markdown")
+        await msg.reply_text(WELCOME_TEXT, parse_mode="Markdown")
 
-    msg = update.effective_message
+    # Panels IMMER an die gleiche Nachricht anhängen
+    await msg.reply_text("🎯 Player Panel", reply_markup=player_keyboard())
+    await msg.reply_text("🛠 Host Panel", reply_markup=host_keyboard())
 
-await msg.reply_text("🎯 Player Panel", reply_markup=player_keyboard())
-await msg.reply_text("🛠 Host Panel", reply_markup=host_keyboard())
 
 
 async def templ_status(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
