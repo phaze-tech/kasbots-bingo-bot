@@ -259,28 +259,36 @@ def _user_board_count(user_id: int) -> int:
 
 # ---------- Grundbefehle ----------
 
+# ---------- Grundbefehle ----------
+
 async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     """Sends the welcome image + text + both panels."""
     if not in_allowed_topic(update):
         return
 
+    chat = update.effective_chat  # funktioniert in Gruppe + Privat
+    msg = update.effective_message
+
+    # Begrüßungsbild + Text
     if WELCOME_IMAGE and os.path.exists(WELCOME_IMAGE):
         try:
             with open(WELCOME_IMAGE, "rb") as f:
-                await update.message.reply_photo(
+                await chat.send_photo(
                     photo=f,
                     caption=WELCOME_TEXT,
                     parse_mode="Markdown"
                 )
         except Exception as e:
             logger.warning(f"Couldn't send image '{WELCOME_IMAGE}': {e}")
-            await update.message.reply_text(WELCOME_TEXT, parse_mode="Markdown")
+            await chat.send_message(WELCOME_TEXT, parse_mode="Markdown")
     else:
         logger.warning(f"WELCOME_IMAGE not found at '{WELCOME_IMAGE}'")
-        await update.message.reply_text(WELCOME_TEXT, parse_mode="Markdown")
+        await chat.send_message(WELCOME_TEXT, parse_mode="Markdown")
 
-    await update.message.reply_text("🎯 Player Panel", reply_markup=player_keyboard())
-    await update.message.reply_text("🛠 Host Panel", reply_markup=host_keyboard())
+    # Panels immer über den Chat schicken (nicht update.message)
+    await chat.send_message("🎯 Player Panel", reply_markup=player_keyboard())
+    await chat.send_message("🛠 Host Panel", reply_markup=host_keyboard())
+
 
 async def templ_status(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     if not in_allowed_topic(update):
