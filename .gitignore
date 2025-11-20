@@ -1,0 +1,20 @@
+# --- Python Cache ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# --- Virtual Environment ---
+.venv/
+
+# --- Local config / secrets ---
+.env
+
+# --- Local storage (OCR, uploaded images, sqlite DB) ---
+storage/
+*.db
+
+# --- IDE / Editor Stuff ---
+.vscode/
+.idea/
+*.swp
